@@ -1,0 +1,21 @@
+[flake8]
+# Ignore specific warnings (example: E501 for line length)
+ignore = E501, W503
+
+# Set max line length (PEP 8 default is 79, but 100–120 is common)
+max-line-length = 100
+
+# Exclude specific directories (like virtual environments and migrations)
+exclude = .git, __pycache__, venv, env, .venv, migrations, node_modules
+
+# Set the maximum allowed complexity for functions (Cyclomatic Complexity)
+max-complexity = 10
+
+# Enable type hints linting (optional)
+enable-extensions = G
+
+# Use format-friendly output
+format = default
+
+# Allow linting specific files only
+# filename = *.py

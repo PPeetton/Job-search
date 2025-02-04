@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JobHunt - Find Your Dream Job</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f7fa;
+            --text-color: #333;
+            --border-color: #e1e4e8;
+            --gradient-start: #4a90e2;
+            --gradient-end: #34495e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 0 0 50% 50% / 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-form, .filter-form {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-form:hover, .filter-form:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        .multiselect {
+            position: relative;
+            width: 100%;
+        }
+
+        .multiselect-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 4px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .multiselect.active .multiselect-dropdown {
+            display: block;
+        }
+
+        .selected-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            min-height: 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .selected-options:hover {
+            border-color: var(--primary-color);
+        }
+
+        .multiselect-option {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .multiselect-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        .multiselect-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .selected-option {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.9rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .selected-option span {
+            margin-right: 6px;
+        }
+
+        .selected-option button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0 4px;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(74, 144, 226, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .job-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .job-item {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .job-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+        }
+
+        .job-title:hover {
+            text-decoration: underline;
+        }
+
+        .job-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .job-location, .job-source {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .job-description {
+            font-size: 0.95rem;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #28a745, #218838);
+            display: none;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-download:hover {
+            background: linear-gradient(135deg, #218838, #1e7e34);
+        }
+
+        .last-searches {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .last-searches summary {
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .last-searches ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .last-searches li {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .last-searches li:last-child {
+            border-bottom: none;
+        }
+
+        .last-searches li:hover {
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .search-form, .filter-form {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>JobHunt</h1>
+        <p>Find Your Dream Job</p>
+    </header>
+
+    <div class="container">
+        <details id="last-searches" class="last-searches">
+            <summary>Last Searches</summary>
+            <ul id="last-searches-list"></ul>
+        </details>
+
+        <form id="job-form" class="search-form">
+            <div class="form-group">
+                <label for="job-title">Job Title</label>
+                <input type="text" id="job-title" placeholder="E.g., Software Developer" required />
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="E.g., New York" required />
+            </div>
+            <div class="form-group">
+                <label for="num-jobs">Number of Jobs</label>
+                <input type="number" id="num-jobs" placeholder="E.g., 50" required />
+            </div>
+            <div class="form-group">
+                <label>Job Sources</label>
+                <div class="multiselect">
+                    <div class="selected-options" id="selected-options"></div>
+                    <div class="multiselect-dropdown">
+                        <div class="multiselect-option" data-value="Indeed">Indeed</div>
+                        <div class="multiselect-option" data-value="ZipRecruiter">ZipRecruiter</div>
+                        <div class="multiselect-option" data-value="LinkedIn">LinkedIn</div>
+                    </div>
+                </div>
+                <input type="hidden" id="job-source" name="job-source" required />
+            </div>
+            <div class="form-group">
+                <label for="job-country">Country</label>
+                <select id="job-country" required>
+                    <option value="in">India</option>
+                    <option value="ca">Canada</option>
+                    <option value="sg">Singapore</option>
+                    <option value="ar">Argentina</option>
+                    <option value="au">Australia</option>
+                    <option value="ch">Switzerland</option>
+                    <option value="uk">United Kingdom</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Search Jobs</button>
+        </form>
+
+        <div id="loading-spinner" class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+
+        <div id="filter-form" class="filter-form" style="display: none;">
+            <div class="form-group">
+                <label for="filter-platform">Filter by Platform:</label>
+                <select id="filter-platform">
+                    <option value="all">All</option>
+                    <option value="Indeed">Indeed</option>
+                    <option value="ZipRecruiter">ZipRecruiter</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="filter-location">Filter by Location:</label>
+                <input type="text" id="filter-location" placeholder="Enter location">
+            </div>
+            <div class="form-group">
+                <label for="filter-title">Filter by Job Title:</label>
+                <input type="text" id="filter-title" placeholder="Enter job title">
+            </div>
+            <div class="form-group">
+                <label>Filter by Date:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="filter-day" placeholder="DD" min="1" max="31" style="width: 70px;">
+                    <select id="filter-month" style="width: 100px;">
+                        <option value="">Month</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <input type="number" id="filter-year" placeholder="YYYY" min="2000" max="2100" style="width: 80px;">
+                </div>
+            </div>
+        </div>
+
+        <button id="download-csv" class="btn btn-download">Download CSV</button>
+        <div id="job-list" class="job-list"></div>
+    </div>
+
+    <script>
+        // Multiselect functionality
+        const multiselect = document.querySelector('.multiselect');
+        const selectedOptions = document.getElementById('selected-options');
+        const hiddenInput = document.getElementById('job-source');
+        const options = document.querySelectorAll('.multiselect-option');
+        let selectedValues = [];
+
+        selectedOptions.addEventListener('click', () => {
+            multiselect.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!multiselect.contains(e.target)) {
+                multiselect.classList.remove('active');
+            }
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const value = option.dataset.value;
+                if (option.classList.contains('selected')) {
+                    option.classList.remove('selected');
+                    selectedValues = selectedValues.filter(v => v !== value);
+                } else {
+                    option.classList.add('selected');
+                    selectedValues.push(value);
+                }
+                updateSelectedOptions();
+                hiddenInput.value = selectedValues.join(',');
+            });
+        });
+
+        function updateSelectedOptions() {
+            selectedOptions.innerHTML = selectedValues.map(value => `
+                <div class="selected-option">
+                    <span>${value}</span>
+                    <button type="button" onclick="removeOption('${value}')">×</button>
+                </div>
+            `).join('');
+
+            if (selectedValues.length === 0) {
+                selectedOptions.innerHTML = '<span style="color: #666; padding: 4px 8px;">Select job sources</span>';
+            }
+        }
+
+        function removeOption(value) {
+            const option = document.querySelector(`.multiselect-option[data-value="${value}"]`);
+            option.classList.remove('selected');
+            selectedValues = selectedValues.filter(v => v !== value);
+            updateSelectedOptions();
+            hiddenInput.value = selectedValues.join(',');
+        }
+
+        updateSelectedOptions();
+
+        // Job search and display functionality
+        let fetchedJobs = [];
+
+        document.getElementById("job-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const jobTitle = document.getElementById("job-title").value;
+            const location = document.getElementById("location").value;
+            const numJobs = document.getElementById("num-jobs").value;
+            const jobCountry = document.getElementById("job-country").value;
+            const jobUrl = `https://${jobCountry}.indeed.com/`;
+
+            document.getElementById("loading-spinner").style.display = "block";
+            document.getElementById("job-list").innerHTML = "";
+            document.getElementById("download-csv").style.display = "none";
+            document.getElementById("filter-form").style.display = "none";
+
+            // Save the search data
+            saveSearch({
+                jobTitle,
+                location,
+                numJobs,
+                jobCountry,
+                jobSources: selectedValues
+            });
+
+            fetch(`/search_jobs?job_title=${jobTitle}&location=${location}&num_jobs=${numJobs}&job_source=${selectedValues.join(',')}&job_url=${jobUrl}&job_country=${jobCountry}`)
+                .then(response => response.json())
+                .then(jobs => {
+                    fetchedJobs = jobs;
+                    displayJobs(jobs);
+                    document.getElementById("filter-form").style.display = "block";
+                })
+                .catch(error => {
+                    console.error("Error fetching jobs:", error);
+                    document.getElementById("loading-spinner").style.display = "none";
+                    document.getElementById("job-list").innerHTML = `
+                        <div style="text-align: center; color: #dc3545; padding: 2rem;">
+                            Error loading jobs. Please try again.
+                        </div>
+                    `;
+                });
+        });
+
+        function displayJobs(jobs) {
+            const jobListDiv = document.getElementById("job-list");
+            jobListDiv.innerHTML = "";
+
+            jobs.forEach(job => {
+                const jobDiv = document.createElement("div");
+                jobDiv.classList.add("job-item");
+                jobDiv.innerHTML = `
+                    <a href="${job.link}" target="_blank" class="job-title">${job.title}</a>
+                    <div class="job-info">
+                        <div class="job-source">${job.source}</div>
+                        <div class="job-location">📍 ${job.location} ${'\n'}  </div>
+                        <div class="job-location">${job.date}</div>
+                    </div>
+                    <div class="job-description">${job.description}</div>
+                `;
+                jobListDiv.appendChild(jobDiv);
+            });
+
+            document.getElementById("loading-spinner").style.display = "none";
+            document.getElementById("download-csv").style.display = "block";
+        }
+
+        // Filtering functionality
+        const filterPlatform = document.getElementById('filter-platform');
+        const filterLocation = document.getElementById('filter-location');
+        const filterTitle = document.getElementById('filter-title');
+        const filterDay = document.getElementById('filter-day');
+        const filterMonth = document.getElementById('filter-month');
+        const filterYear = document.getElementById('filter-year');
+
+        function filterJobs() {
+            const platformFilter = filterPlatform.value.toLowerCase();
+            const locationFilter = filterLocation.value.toLowerCase();
+            const titleFilter = filterTitle.value.toLowerCase();
+            const dayFilter = filterDay.value;
+            const monthFilter = filterMonth.value;
+            const yearFilter = filterYear.value;
+
+            const filteredJobs = fetchedJobs.filter(job => {
+                const platformMatch = platformFilter === 'all' || job.source.toLowerCase() === platformFilter;
+                const locationMatch = job.location.toLowerCase().includes(locationFilter);
+                const titleMatch = smartTitleFilter(job.title.toLowerCase(), titleFilter);
+                const dateMatch = matchDate(job.date, dayFilter, monthFilter, yearFilter);
+                return platformMatch && locationMatch && titleMatch && dateMatch;
+            });
+
+            displayJobs(filteredJobs);
+        }
+
+        function smartTitleFilter(jobTitle, searchTitle) {
+            if (searchTitle === '') return true;
+            
+            const searchTerms = searchTitle.split(' ');
+            const jobTitleTerms = jobTitle.split(' ');
+
+            return searchTerms.every(term => {
+                return jobTitleTerms.some(jobTerm => jobTerm.startsWith(term));
+            });
+        }
+
+        function matchDate(jobDate, day, month, year) {
+            if (!day && !month && !year) return true; // No date filter applied
+
+            // Assuming jobDate is in the format "dd-mm-yyyy"
+            const [jobDay, jobMonth, jobYear] = jobDate.split('-');
+
+            const dayMatch = !day || jobDay === day.padStart(2, '0');
+            const monthMatch = !month || jobMonth === month.padStart(2, '0');
+            const yearMatch = !year || jobYear === year;
+
+            return dayMatch && monthMatch && yearMatch;
+        }
+
+        filterPlatform.addEventListener('change', filterJobs);
+        filterLocation.addEventListener('input', filterJobs);
+        filterTitle.addEventListener('input', filterJobs);
+        filterDay.addEventListener('input', filterJobs);
+        filterMonth.addEventListener('change', filterJobs);
+        filterYear.addEventListener('input', filterJobs);
+
+        // CSV Download functionality
+        document.getElementById('download-csv').addEventListener('click', function() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Title,Location,Source,Description,Link\n";
+
+            fetchedJobs.forEach(function(job) {
+                let row = [
+                    job.title,
+                    job.location,
+                    job.source,
+                    job.description,
+                    job.link
+                ].map(e => `"${e}"`).join(",");
+                csvContent += row + "\n";
+            });
+
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "job_listings.csv");
+            document.body.appendChild(link);
+            link.click();
+        });
+
+        // Function to save search to local storage
+        function saveSearch(searchData) {
+            let searches = JSON.parse(localStorage.getItem('lastSearches')) || [];
+            searches.unshift(searchData);
+            searches = searches.slice(0, 5); // Keep only the last 5 searches
+            localStorage.setItem('lastSearches', JSON.stringify(searches));
+            updateLastSearchesList();
+        }
+
+        // Function to update the last searches list
+        function updateLastSearchesList() {
+            const searches = JSON.parse(localStorage.getItem('lastSearches')) || [];
+            const list = document.getElementById('last-searches-list');
+            list.innerHTML = '';
+            searches.forEach((search, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${search.jobTitle} in ${search.location}`;
+                li.addEventListener('click', () => fillSearchForm(search));
+                list.appendChild(li);
+            });
+        }
+
+        // Function to fill the search form with saved data
+        function fillSearchForm(searchData) {
+            document.getElementById('job-title').value = searchData.jobTitle;
+            document.getElementById('location').value = searchData.location;
+            document.getElementById('num-jobs').value = searchData.numJobs;
+            document.getElementById('job-country').value = searchData.jobCountry;
+            
+            // Update job sources
+            selectedValues = searchData.jobSources;
+            updateSelectedOptions();
+            hiddenInput.value = selectedValues.join(',');
+            
+            // Trigger the search
+            document.getElementById('job-form').dispatchEvent(new Event('submit'));
+        }
+
+        // Call this function when the page loads to populate the last searches list
+        updateLastSearchesList();
+    </script>
+</body>
+</html>
